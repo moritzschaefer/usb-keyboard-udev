@@ -1,0 +1,1 @@
+SUBSYSTEM=="input", ACTION=="add", RUN="/usr/bin/usb-keyboard-in_udev"

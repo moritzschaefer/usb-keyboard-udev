@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if ! /usr/bin/udev_i_am_the_first $$ /tmp/udev-keyboard.pid; then
+echo "Another similar script is running, so I will exit and let that one run" >&2
+exit 1;
+fi
+
+do_set ()
+{
+    env XAUTHORITY=/home/moritz/.Xauthority DISPLAY=:0 HOME=/home/moritz xmodmap /home/moritz/.Xmodmap
+}
+# Debian 8 takes a long time to load the keyboard on my machine, and there is no way to know when it is done.
+sleep 3; do_set;

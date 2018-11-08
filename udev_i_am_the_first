@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# usage: udev_i_am_the_first my_pid /tmp/filename.pid
+
+# this script checks to see if another process that uses the same .pid file is also running
+
+pid=$1 # the pid of the script that called me
+pfl=$2 # the pid file to check
+
+if [[ -f $pfl ]]; then
+# if it already exists, see if it is really old
+mtime=$(stat -c %Y $pfl) # get the last modification time, in seconds
+dat=$(date +%s) # get the time now, in seconds
+dif=$((dat-mtime)); # find the difference, in seconds
+if ((dif>20)); then rm $pfl; else exit 1; fi
+# so if a pid file exists that is older than 20 seconds, delete it.
+# If newer, then let the other instance run -- I will exit
+fi
+
+# okay, my caller is (hopefully) the only instance running, so put $pid in $pfl
+echo $pid > $pfl
+
+# But just in case two instances did that at the same time...
+(( $(<$pfl) == $pid )) || exit 1
+sleep 0.$RANDOM # this should separate instances that started at the same time
+(( $(<$pfl) == $pid )) || exit 1
+
+exit 0
